@@ -4,11 +4,12 @@ namespace adoolaard\LumenRoutesList;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 
 class RoutesCommand extends Command
 {
-
     /**
      * The console command name.
      *
@@ -47,7 +48,7 @@ class RoutesCommand extends Command
         $this->displayRoutes($this->getRoutes());
     }
 
-    /**
+/**
      * Compile the routes into a displayable format.
      *
      * @return array
@@ -60,38 +61,28 @@ class RoutesCommand extends Command
         $rows = array();
         foreach ($routeCollection as $route) {
             $controller = $this->getController($route['action']);
+            // Show class name without namespace
+            if ($this->option('compact') && $controller !== 'None')
+                $controller = substr($controller, strrpos($controller, '\\') + 1);
 
             $rows[] = [
-                'verb'       => strtoupper($route['method']),
-                'path'       => $route['uri'],
-                'namedRoute' => $this->getNamedRoute($route['action']),
-                'controller' => $controller,
-                'action'     => $this->getAction($route['action']),
+                'method'     => $route['method'],
+                'uri'        => $route['uri'],
+                'name'       => $this->getNamedRoute($route['action']),
+                'action'     => $controller . '@' . $this->getAction($route['action']),
                 'middleware' => $this->getMiddleware($route['action']),
             ];
         }
 
+        // Filter the routes by the specified HTTP method if the 'method' option is provided
         if ($method = $this->option('method')) {
             $rows = array_filter($rows, function ($route) use ($method) {
-                return strcasecmp($route['verb'], $method) === 0;
+                return strcasecmp($route['method'], $method) === 0;
             });
-        }
-
-        // Format the routes for display
-        foreach ($rows as &$route) {
-            // Combine GET and HEAD methods into one as Laravel does
-            $route['verb'] = $route['verb'] === 'GET|HEAD' ? 'GET|HEAD' : $route['verb'];
-
-            // Format URI to fit the console width if necessary
-            $route['path'] = $this->formatValueForConsole($route['path']);
-
-            // Format Action to fit the console width if necessary
-            $route['action'] = $this->formatValueForConsole($route['action']);
         }
 
         return $this->pluckColumns($rows);
     }
-
 /**
  * Format a value to fit within the console window width.
  *
@@ -196,7 +187,7 @@ protected function getConsoleWidth()
      * @param  array $routes
      * @return void
      */
-    protected function displayRoutes(array $routes)
+protected function displayRoutes(array $routes)
     {
         if (empty($routes)) {
             return $this->error("Your application doesn't have any routes.");
@@ -205,9 +196,9 @@ protected function getConsoleWidth()
         // Format the routes table for display
         $routes = array_map(function ($route) {
             // Format the route's method
-            $route['verb'] = $route['verb'] === 'GET|HEAD' ? 'GET|HEAD' : $route['verb'];
+            $route['method'] = $route['method'] === 'GET|HEAD' ? 'GET|HEAD' : $route['method'];
             // Format the route's URI
-            $route['path'] = $this->formatRouteUri($route['path']);
+            $route['uri'] = $this->formatRouteUri($route['uri']);
             // Format the route's action
             $route['action'] = $this->formatRouteAction($route['action']);
             return $route;
@@ -215,7 +206,6 @@ protected function getConsoleWidth()
 
         $this->table($this->getHeaders(), $routes);
     }
-
     /**
      * Format the route's URI for display.
      *
