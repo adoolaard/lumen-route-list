@@ -61,8 +61,9 @@ class RoutesCommand extends Command
         foreach ($routeCollection as $route) {
             $controller = $this->getController($route['action']);
             // Show class name without namesapce
-            if ($this->option('compact') && $controller !== 'None')
+            if ($this->option('compact') && $controller !== 'None') {
                 $controller = substr($controller, strrpos($controller, '\\') + 1);
+            }
 
             $rows[] = [
                 'verb'       => $route['method'],
@@ -74,11 +75,19 @@ class RoutesCommand extends Command
             ];
         }
 
+        // Filter the routes by the specified HTTP method if the 'method' option is provided
+        if ($method = $this->option('method')) {
+            $rows = array_filter($rows, function ($route) use ($method) {
+                // You can use 'strcasecmp' for case-insensitive comparison or '===' for case-sensitive comparison
+                return strcasecmp($route['verb'], $method) === 0;
+            });
+        }
+
         return $this->pluckColumns($rows);
     }
 
     /**
-     * @param array $action
+     * @param  array $action
      * @return string
      */
     protected function getNamedRoute(array $action)
@@ -87,7 +96,7 @@ class RoutesCommand extends Command
     }
 
     /**
-     * @param array $action
+     * @param  array $action
      * @return mixed|string
      */
     protected function getController(array $action)
@@ -100,7 +109,7 @@ class RoutesCommand extends Command
     }
 
     /**
-     * @param array $action
+     * @param  array $action
      * @return string
      */
     protected function getAction(array $action)
@@ -118,7 +127,7 @@ class RoutesCommand extends Command
     }
 
     /**
-     * @param array $action
+     * @param  array $action
      * @return string
      */
     protected function getMiddleware(array $action)
@@ -132,20 +141,22 @@ class RoutesCommand extends Command
     /**
      * Remove unnecessary columns from the routes.
      *
-     * @param  array  $routes
+     * @param  array $routes
      * @return array
      */
     protected function pluckColumns(array $routes)
     {
-        return array_map(function ($route) {
-            return Arr::only($route, $this->getColumns());
-        }, $routes);
+        return array_map(
+            function ($route) {
+                return Arr::only($route, $this->getColumns());
+            }, $routes
+        );
     }
 
     /**
      * Display the route information on the console.
      *
-     * @param  array  $routes
+     * @param  array $routes
      * @return void
      */
     protected function displayRoutes(array $routes)
@@ -207,6 +218,13 @@ class RoutesCommand extends Command
                 'c',
                 InputOption::VALUE_NONE,
                 'Only show verb, path, controller and action columns'
+            ],
+
+            [
+                'method',
+                'm',
+                InputOption::VALUE_OPTIONAL,
+                'Filter the routes by method (e.g., GET, POST, etc.)'
             ]
         ];
     }
