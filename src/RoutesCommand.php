@@ -44,8 +44,31 @@ class RoutesCommand extends Command
      */
     public function handle()
     {
-        $this->displayRoutes($this->getRoutes());
+        $routes = $this->getRoutes();
+
+        if ($this->option('json')) {
+            return $this->displayRoutesAsJson($routes);
+        }
+
+        $this->displayRoutes($routes);
     }
+
+        /**
+     * Display the route information as JSON.
+     *
+     * @param  array $routes
+     * @return void
+     */
+    protected function displayRoutesAsJson(array $routes)
+    {
+        if (empty($routes)) {
+            return $this->error("Your application doesn't have any routes.");
+        }
+
+        $json = json_encode($routes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $this->line($json);
+    }
+
 
     /**
      * Compile the routes into a displayable format.
@@ -206,6 +229,13 @@ class RoutesCommand extends Command
     protected function getOptions()
     {
         return [
+            [
+                'json',
+                null,
+                InputOption::VALUE_NONE,
+                'Display the routes in JSON format'
+            ],
+
             [
                 'columns',
                 null,
