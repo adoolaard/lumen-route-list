@@ -17,7 +17,7 @@ This package is a fork of [appzcoder/lumen-routes-list]. So all credits go to [a
 
 2. Add service provider into **/bootstrap/app.php** file.
     ```php
-    $app->register(Appzcoder\LumenRoutesList\RoutesCommandServiceProvider::class);
+    $app->register(adoolaard\LumenRoutesList\RoutesCommandServiceProvider::class);
     ```
 3. Run ```composer dump-autoload```
 
