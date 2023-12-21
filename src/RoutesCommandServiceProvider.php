@@ -1,6 +1,6 @@
 <?php
 
-namespace Appzcoder\LumenRoutesList;
+namespace adoolaard\LumenRoutesList;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -13,6 +13,6 @@ class RoutesCommandServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->commands('Appzcoder\LumenRoutesList\RoutesCommand');
+        $this->commands('adoolaard\LumenRoutesList\RoutesCommand');
     }
 }

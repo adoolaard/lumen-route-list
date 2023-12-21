@@ -1,10 +1,12 @@
 # Lumen Route List Display
 
-[![Total Downloads](https://poser.pugx.org/appzcoder/lumen-routes-list/d/total.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list)
-[![Latest Stable Version](https://poser.pugx.org/appzcoder/lumen-routes-list/v/stable.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list)
-[![Latest Unstable Version](https://poser.pugx.org/appzcoder/lumen-routes-list/v/unstable.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list)
-[![License](https://poser.pugx.org/appzcoder/lumen-routes-list/license.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list)
+<!-- [![Total Downloads](https://poser.pugx.org/appzcoder/lumen-routes-list/d/total.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list) -->
+<!-- [![Latest Stable Version](https://poser.pugx.org/appzcoder/lumen-routes-list/v/stable.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list) -->
+<!-- [![Latest Unstable Version](https://poser.pugx.org/appzcoder/lumen-routes-list/v/unstable.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list) -->
+<!-- [![License](https://poser.pugx.org/appzcoder/lumen-routes-list/license.svg)](https://packagist.org/packages/appzcoder/lumen-routes-list) -->
 
+## About
+This package is a fork of [appzcoder/lumen-routes-list]. So all credits go to [appzcoder].
 
 ## Installation
 
@@ -24,8 +26,3 @@
 ```
 php artisan route:list
 ```
-
-
-## Author
-
-<a href="http://www.sohelamin.com">Sohel Amin</a>

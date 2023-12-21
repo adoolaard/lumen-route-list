@@ -1,6 +1,6 @@
 <?php
 
-namespace Appzcoder\LumenRoutesList;
+namespace adoolaard\LumenRoutesList;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
