@@ -4,12 +4,11 @@ namespace adoolaard\LumenRoutesList;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 
 class RoutesCommand extends Command
 {
+
     /**
      * The console command name.
      *
@@ -29,7 +28,7 @@ class RoutesCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = array('Verb', 'Path', 'NamedRoute', 'Controller', 'Action', 'Middleware');
 
     /**
      * The columns to display when using the "compact" flag.
@@ -48,7 +47,7 @@ class RoutesCommand extends Command
         $this->displayRoutes($this->getRoutes());
     }
 
-/**
+    /**
      * Compile the routes into a displayable format.
      *
      * @return array
@@ -61,15 +60,17 @@ class RoutesCommand extends Command
         $rows = array();
         foreach ($routeCollection as $route) {
             $controller = $this->getController($route['action']);
-            // Show class name without namespace
-            if ($this->option('compact') && $controller !== 'None')
+            // Show class name without namesapce
+            if ($this->option('compact') && $controller !== 'None') {
                 $controller = substr($controller, strrpos($controller, '\\') + 1);
+            }
 
             $rows[] = [
-                'method'     => $route['method'],
-                'uri'        => $route['uri'],
-                'name'       => $this->getNamedRoute($route['action']),
-                'action'     => $controller . '@' . $this->getAction($route['action']),
+                'verb'       => $route['method'],
+                'path'       => $route['uri'],
+                'namedRoute' => $this->getNamedRoute($route['action']),
+                'controller' => $controller,
+                'action'     => $this->getAction($route['action']),
                 'middleware' => $this->getMiddleware($route['action']),
             ];
         }
@@ -77,43 +78,14 @@ class RoutesCommand extends Command
         // Filter the routes by the specified HTTP method if the 'method' option is provided
         if ($method = $this->option('method')) {
             $rows = array_filter($rows, function ($route) use ($method) {
-                return strcasecmp($route['method'], $method) === 0;
+                // You can use 'strcasecmp' for case-insensitive comparison or '===' for case-sensitive comparison
+                return strcasecmp($route['verb'], $method) === 0;
             });
         }
 
         return $this->pluckColumns($rows);
     }
-/**
- * Format a value to fit within the console window width.
- *
- * @param  string $value
- * @return string
- */
-protected function formatValueForConsole($value)
-{
-    // Retrieve the console window width
-    $consoleWidth = $this->getConsoleWidth();
 
-    // If the value is longer than the width, we truncate it
-    if (strlen($value) > $consoleWidth) {
-        return substr($value, 0, $consoleWidth - 3) . '...';
-    }
-
-    return $value;
-}
-
-/**
- * Get the width of the console window.
- *
- * @return int
- */
-protected function getConsoleWidth()
-{
-    // Symfony's Terminal class can be used to get the width of the console
-    // Alternatively, you may use a default width or calculate it differently
-    $terminal = new \Symfony\Component\Console\Terminal();
-    return $terminal->getWidth();
-}
     /**
      * @param  array $action
      * @return string
@@ -187,49 +159,13 @@ protected function getConsoleWidth()
      * @param  array $routes
      * @return void
      */
-protected function displayRoutes(array $routes)
+    protected function displayRoutes(array $routes)
     {
         if (empty($routes)) {
             return $this->error("Your application doesn't have any routes.");
         }
 
-        // Format the routes table for display
-        $routes = array_map(function ($route) {
-            // Format the route's method
-            $route['method'] = $route['method'] === 'GET|HEAD' ? 'GET|HEAD' : $route['method'];
-            // Format the route's URI
-            $route['uri'] = $this->formatRouteUri($route['uri']);
-            // Format the route's action
-            $route['action'] = $this->formatRouteAction($route['action']);
-            return $route;
-        }, $routes);
-
         $this->table($this->getHeaders(), $routes);
-    }
-    /**
-     * Format the route's URI for display.
-     *
-     * @param  string $uri
-     * @return string
-     */
-    protected function formatRouteUri($uri)
-    {
-        // Implement logic to format the URI similar to Laravel's route:list
-        // For example, you might use the Symfony's OutputFormatter to truncate the string
-        return $uri;
-    }
-
-    /**
-     * Format the route's action for display.
-     *
-     * @param  string $action
-     * @return string
-     */
-    protected function formatRouteAction($action)
-    {
-        // Implement logic to format the action similar to Laravel's route:list
-        // For example, you might use the Symfony's OutputFormatter to truncate the string
-        return $action;
     }
 
     /**
