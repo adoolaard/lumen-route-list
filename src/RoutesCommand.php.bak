@@ -28,7 +28,7 @@ class RoutesCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = array('Verb', 'Path', 'NamedRoute', 'Controller', 'Action', 'Middleware');
 
     /**
      * The columns to display when using the "compact" flag.
@@ -60,9 +60,13 @@ class RoutesCommand extends Command
         $rows = array();
         foreach ($routeCollection as $route) {
             $controller = $this->getController($route['action']);
+            // Show class name without namesapce
+            if ($this->option('compact') && $controller !== 'None') {
+                $controller = substr($controller, strrpos($controller, '\\') + 1);
+            }
 
             $rows[] = [
-                'verb'       => strtoupper($route['method']),
+                'verb'       => $route['method'],
                 'path'       => $route['uri'],
                 'namedRoute' => $this->getNamedRoute($route['action']),
                 'controller' => $controller,
@@ -71,58 +75,17 @@ class RoutesCommand extends Command
             ];
         }
 
+        // Filter the routes by the specified HTTP method if the 'method' option is provided
         if ($method = $this->option('method')) {
             $rows = array_filter($rows, function ($route) use ($method) {
+                // You can use 'strcasecmp' for case-insensitive comparison or '===' for case-sensitive comparison
                 return strcasecmp($route['verb'], $method) === 0;
             });
-        }
-
-        // Format the routes for display
-        foreach ($rows as &$route) {
-            // Combine GET and HEAD methods into one as Laravel does
-            $route['verb'] = $route['verb'] === 'GET|HEAD' ? 'GET|HEAD' : $route['verb'];
-
-            // Format URI to fit the console width if necessary
-            $route['path'] = $this->formatValueForConsole($route['path']);
-
-            // Format Action to fit the console width if necessary
-            $route['action'] = $this->formatValueForConsole($route['action']);
         }
 
         return $this->pluckColumns($rows);
     }
 
-/**
- * Format a value to fit within the console window width.
- *
- * @param  string $value
- * @return string
- */
-protected function formatValueForConsole($value)
-{
-    // Retrieve the console window width
-    $consoleWidth = $this->getConsoleWidth();
-
-    // If the value is longer than the width, we truncate it
-    if (strlen($value) > $consoleWidth) {
-        return substr($value, 0, $consoleWidth - 3) . '...';
-    }
-
-    return $value;
-}
-
-/**
- * Get the width of the console window.
- *
- * @return int
- */
-protected function getConsoleWidth()
-{
-    // Symfony's Terminal class can be used to get the width of the console
-    // Alternatively, you may use a default width or calculate it differently
-    $terminal = new \Symfony\Component\Console\Terminal();
-    return $terminal->getWidth();
-}
     /**
      * @param  array $action
      * @return string
@@ -202,44 +165,7 @@ protected function getConsoleWidth()
             return $this->error("Your application doesn't have any routes.");
         }
 
-        // Format the routes table for display
-        $routes = array_map(function ($route) {
-            // Format the route's method
-            $route['verb'] = $route['verb'] === 'GET|HEAD' ? 'GET|HEAD' : $route['verb'];
-            // Format the route's URI
-            $route['path'] = $this->formatRouteUri($route['path']);
-            // Format the route's action
-            $route['action'] = $this->formatRouteAction($route['action']);
-            return $route;
-        }, $routes);
-
         $this->table($this->getHeaders(), $routes);
-    }
-
-    /**
-     * Format the route's URI for display.
-     *
-     * @param  string $uri
-     * @return string
-     */
-    protected function formatRouteUri($uri)
-    {
-        // Implement logic to format the URI similar to Laravel's route:list
-        // For example, you might use the Symfony's OutputFormatter to truncate the string
-        return $uri;
-    }
-
-    /**
-     * Format the route's action for display.
-     *
-     * @param  string $action
-     * @return string
-     */
-    protected function formatRouteAction($action)
-    {
-        // Implement logic to format the action similar to Laravel's route:list
-        // For example, you might use the Symfony's OutputFormatter to truncate the string
-        return $action;
     }
 
     /**
