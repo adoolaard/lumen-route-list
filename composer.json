@@ -1,7 +1,7 @@
 {
-    "name": "appzcoder/lumen-routes-list",
+    "name": "adoolaard/lumen-routes-list",
     "license": "MIT",
-    "description": "Display the route list of Lumen",
+    "description": "Final Lumen update - Display the route list of Lumen",
     "keywords": [
         "lumen",
         "route list"
@@ -14,8 +14,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9|^7.0|^8.0",
-        "illuminate/support": "^5.0|^6.0|^7.0|^8.0|^9.0"
+        "php": ">=5.5.9|^7.0|^8.0|^8.1",
+        "illuminate/support": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0"
     },
     "autoload": {
         "psr-4": {

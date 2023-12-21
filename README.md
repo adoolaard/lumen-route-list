@@ -10,7 +10,7 @@
 
 1. Run
     ```
-    composer require appzcoder/lumen-routes-list
+    composer require adoolaard/lumen-routes-list
     ```
 
 2. Add service provider into **/bootstrap/app.php** file.
